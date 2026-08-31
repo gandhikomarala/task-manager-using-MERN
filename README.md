@@ -2,7 +2,6 @@
 
 [![CI Pipeline](https://github.com/gandhikomarala/task-manager-using-MERN/actions/workflows/ci.yml/badge.svg)](https://github.com/gandhikomarala/task-manager-using-MERN/actions)
 [![Security Audit](https://github.com/gandhikomarala/task-manager-using-MERN/actions/workflows/security-scan.yml/badge.svg)](https://github.com/gandhikomarala/task-manager-using-MERN/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10 | 3.11 | 3.12](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-brightgreen.svg)](pyproject.toml)
 [![Lines of Code](https://img.shields.io/badge/LOC-79,363-informational.svg)](README.md)
 
