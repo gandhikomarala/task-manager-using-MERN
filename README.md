@@ -17,7 +17,7 @@ TaskFlow Pro — Production MERN Sprint & Kanban Manager is a production-grade e
 
 ### 1. Set Up Python Virtual Environment
 ```bash
-git clone gandhikomarala/task-manager-using-MERN.git
+git clone git@github.com:gandhikomarala/task-manager-using-MERN.git
 cd task_manager_mern
 python -m venv venv
 # Windows:
