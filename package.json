@@ -1,19 +1,8 @@
 {
-  "name": "taskflow-pro",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
+  "name": "task_manager_mern",
+  "version": "2.4.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.2",
-    "vite": "^6.4.2"
+    "test": "pytest tests/",
+    "build": "docker build -t task_manager_mern ."
   }
 }
