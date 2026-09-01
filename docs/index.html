@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow Pro — MERN Enterprise Task & Sprint Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #121826;
+      --surface-card: #182234;
+      --border: #223049;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* NAV BAR */
+    nav { background: rgba(18, 24, 38, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 16px 36px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand { font-size: 22px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .brand-icon { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .nav-actions { display: flex; align-items: center; gap: 16px; }
+    .btn-create { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); transition: transform 0.15s; }
+    .btn-create:hover { transform: translateY(-1px); }
+
+    /* SPRINT HEADER */
+    .sprint-header { max-width: 1600px; margin: 24px auto 0 auto; width: 100%; padding: 0 36px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+    .sprint-info h1 { font-size: 26px; font-weight: 900; color: #fff; }
+    .sprint-sub { color: var(--muted); font-size: 14px; margin-top: 4px; display: flex; align-items: center; gap: 12px; }
+    .badge-sprint { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid #6366f1; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+    .stats-bar { display: flex; gap: 16px; }
+    .stat-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 18px; text-align: center; }
+    .stat-val { font-size: 20px; font-weight: 900; color: #fff; }
+    .stat-lbl { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+    /* FILTERS & SEARCH */
+    .filter-wrap { max-width: 1600px; margin: 20px auto 0 auto; width: 100%; padding: 0 36px; display: flex; justify-content: space-between; gap: 16px; }
+    .search-input { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; color: #fff; font-size: 14px; width: 320px; outline: none; }
+    .filter-chips { display: flex; gap: 8px; }
+    .f-chip { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.15s; }
+    .f-chip.active, .f-chip:hover { background: var(--surface-card); color: #fff; border-color: var(--primary); }
+
+    /* KANBAN BOARD */
+    .board-container { flex: 1; max-width: 1600px; margin: 24px auto; width: 100%; padding: 0 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; align-items: start; }
+    .column { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; min-height: 520px; }
+    .col-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .col-title { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+    .col-count { background: var(--surface-card); color: var(--muted); padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 800; }
+    .task-list { display: flex; flex-direction: column; gap: 14px; min-height: 400px; }
+
+    /* TASK CARD */
+    .task-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.15s, border-color 0.15s; position: relative; }
+    .task-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+    .task-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .priority-badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+    .p-urgent { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+    .p-high { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+    .p-med { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid #3b82f6; }
+    .p-low { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+    .task-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+    .task-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 8px; }
+    .task-desc { font-size: 13px; color: var(--muted); line-height: 1.4; margin-bottom: 12px; }
+    .progress-bar { background: var(--bg); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+    .progress-fill { background: linear-gradient(90deg, #6366f1, #10b981); height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .task-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .avatar-grp { display: flex; align-items: center; gap: 6px; }
+    .avatar { width: 26px; height: 26px; border-radius: 50%; background: #6366f1; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .actions { display: flex; gap: 6px; }
+    .btn-move { background: var(--surface); border: 1px solid var(--border); color: var(--muted); width: 26px; height: 26px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-move:hover { color: #fff; border-color: var(--primary); }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: min(90vw, 540px); padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+    .modal h3 { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; outline: none; }
+    .form-field textarea { height: 80px; resize: none; }
+    .modal-btns { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+    .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    .btn-save { background: var(--primary); color: #fff; border: none; padding: 10px 24px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav>
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <span>TaskFlow MERN Suite</span>
+    </div>
+    <div class="nav-actions">
+      <button class="btn-create" onclick="openModal()">+ Create Task</button>
+    </div>
+  </nav>
+
+  <!-- SPRINT HEADER -->
+  <div class="sprint-header">
+    <div class="sprint-info">
+      <h1>Active Sprint: Production Alpha Release</h1>
+      <div class="sprint-sub">
+        <span class="badge-sprint">Sprint 14 • Q3 Roadmap</span>
+        <span>Sprint Velocity: <b>42 Pts</b></span>
+        <span>Target Date: <b>Sep 15, 2026</b></span>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <div class="stat-val" id="total-stat">8</div>
+        <div class="stat-lbl">Total Tasks</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val" style="color:var(--success);" id="done-stat">2</div>
+        <div class="stat-lbl">Completed</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val" style="color:var(--warning);" id="progress-stat">3</div>
+        <div class="stat-lbl">In Progress</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-wrap">
+    <input type="text" class="search-input" placeholder="🔍 Search tasks by title, tag, or ID..." oninput="filterTasks(this.value)">
+    <div class="filter-chips">
+      <button class="f-chip active" onclick="setFilter('all')">All Tasks</button>
+      <button class="f-chip" onclick="setFilter('Urgent')">🔥 Urgent</button>
+      <button class="f-chip" onclick="setFilter('Backend')">⚙️ Backend</button>
+      <button class="f-chip" onclick="setFilter('Frontend')">🎨 Frontend</button>
+    </div>
+  </div>
+
+  <!-- KANBAN BOARD -->
+  <div class="board-container">
+    <!-- COL 1: BACKLOG -->
+    <div class="column">
+      <div class="col-header">
+        <div class="col-title" style="color:#94a3b8;"><span>📥 Backlog</span></div>
+        <span class="col-count" id="count-0">2</span>
+      </div>
+      <div class="task-list" id="col-0"></div>
+    </div>
+
+    <!-- COL 2: IN PROGRESS -->
+    <div class="column">
+      <div class="col-header">
+        <div class="col-title" style="color:#60a5fa;"><span>⚡ In Progress</span></div>
+        <span class="col-count" id="count-1">3</span>
+      </div>
+      <div class="task-list" id="col-1"></div>
+    </div>
+
+    <!-- COL 3: IN REVIEW -->
+    <div class="column">
+      <div class="col-header">
+        <div class="col-title" style="color:#fbbf24;"><span>👁️ In Review</span></div>
+        <span class="col-count" id="count-2">1</span>
+      </div>
+      <div class="task-list" id="col-2"></div>
+    </div>
+
+    <!-- COL 4: COMPLETED -->
+    <div class="column">
+      <div class="col-header">
+        <div class="col-title" style="color:#34d399;"><span>✅ Completed</span></div>
+        <span class="col-count" id="count-3">2</span>
+      </div>
+      <div class="task-list" id="col-3"></div>
+    </div>
+  </div>
+
+  <!-- CREATE TASK MODAL -->
+  <div class="modal-overlay" id="task-modal">
+    <div class="modal">
+      <h3>Create New Task</h3>
+      <div class="form-field">
+        <label>Task Title</label>
+        <input type="text" id="m-title" placeholder="e.g. Implement JWT Refresh Token Rotation">
+      </div>
+      <div class="form-field">
+        <label>Description & Acceptance Criteria</label>
+        <textarea id="m-desc" placeholder="Details about this deliverable..."></textarea>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="form-field">
+          <label>Priority</label>
+          <select id="m-priority">
+            <option value="Urgent">Urgent</option>
+            <option value="High" selected>High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Category Tag</label>
+          <select id="m-cat">
+            <option value="Backend">Backend</option>
+            <option value="Frontend">Frontend</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Security">Security</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveNewTask()">Add to Backlog</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let defaultTasks = [
+      { id: "TSK-101", col: 0, title: "Configure Redis Distributed Lock Pattern", desc: "Prevent race conditions during multi-node batch payouts.", priority: "High", cat: "Backend", progress: 0, assignee: "JD" },
+      { id: "TSK-102", col: 0, title: "Optimize GraphQL DataLoader Batching", desc: "Resolve N+1 query overhead across deeply nested entity resolvers.", priority: "Medium", cat: "Backend", progress: 0, assignee: "SK" },
+      { id: "TSK-103", col: 1, title: "Implement Role-Based Access Control (RBAC)", desc: "Enforce granular permissions across Organization, Project, and Team scopes.", priority: "Urgent", cat: "Security", progress: 65, assignee: "AL" },
+      { id: "TSK-104", col: 1, title: "Build Real-Time WebSocket Notification Bus", desc: "Stream live task assignment and status updates to connected clients.", priority: "High", cat: "Frontend", progress: 40, assignee: "GK" },
+      { id: "TSK-105", col: 1, title: "Configure Prometheus & Grafana Metrics Exporter", desc: "Instrument HTTP latency histograms and memory heap telemetry.", priority: "Medium", cat: "DevOps", progress: 80, assignee: "MK" },
+      { id: "TSK-106", col: 2, title: "Audit MongoDB Sharded Cluster Query Performance", desc: "Analyze compound indexes on high-frequency tenant collection lookups.", priority: "High", cat: "Backend", progress: 95, assignee: "JD" },
+      { id: "TSK-107", col: 3, title: "Automate Docker Multi-Stage Container Builds", desc: "Reduced deployment image footprint from 840MB to 78MB with Alpine base.", priority: "Low", cat: "DevOps", progress: 100, assignee: "GK" },
+      { id: "TSK-108", col: 3, title: "Implement Dark/Light Theme CSS Variable Tokens", desc: "Full WCAG 2.1 AAA color contrast compliance with responsive layout.", priority: "Low", cat: "Frontend", progress: 100, assignee: "AL" }
+    ];
+
+    let tasks = JSON.parse(localStorage.getItem('taskflow_tasks')) || defaultTasks;
+
+    function save() {
+      localStorage.setItem('taskflow_tasks', JSON.stringify(tasks));
+      render();
+    }
+
+    function getPriorityClass(p) {
+      if (p === 'Urgent') return 'p-urgent';
+      if (p === 'High') return 'p-high';
+      if (p === 'Medium') return 'p-med';
+      return 'p-low';
+    }
+
+    function render(filterTerm = '', categoryFilter = 'all') {
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`col-${i}`).innerHTML = '';
+      }
+
+      let counts = [0, 0, 0, 0];
+
+      tasks.forEach((t, idx) => {
+        if (filterTerm && !t.title.toLowerCase().includes(filterTerm.toLowerCase()) && !t.id.toLowerCase().includes(filterTerm.toLowerCase())) return;
+        if (categoryFilter !== 'all' && t.priority !== categoryFilter && t.cat !== categoryFilter) return;
+
+        counts[t.col]++;
+
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        card.innerHTML = `
+          <div class="task-meta">
+            <span class="priority-badge ${getPriorityClass(t.priority)}">${t.priority}</span>
+            <span class="task-id">${t.id}</span>
+          </div>
+          <div class="task-title">${t.title}</div>
+          <div class="task-desc">${t.desc}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${t.progress}%;"></div></div>
+          <div class="task-footer">
+            <div class="avatar-grp">
+              <div class="avatar">${t.assignee}</div>
+              <span style="font-size:12px; color:var(--muted); font-weight:700;">${t.cat}</span>
+            </div>
+            <div class="actions">
+              ${t.col > 0 ? `<button class="btn-move" title="Move Left" onclick="moveTask(${idx}, -1)">◀</button>` : ''}
+              ${t.col < 3 ? `<button class="btn-move" title="Move Right" onclick="moveTask(${idx}, 1)">▶</button>` : ''}
+            </div>
+          </div>
+        `;
+        document.getElementById(`col-${t.col}`).appendChild(card);
+      });
+
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`count-${i}`).innerText = counts[i];
+      }
+      document.getElementById('total-stat').innerText = tasks.length;
+      document.getElementById('done-stat').innerText = counts[3];
+      document.getElementById('progress-stat').innerText = counts[1];
+    }
+
+    function moveTask(idx, delta) {
+      tasks[idx].col = Math.max(0, Math.min(3, tasks[idx].col + delta));
+      if (tasks[idx].col === 3) tasks[idx].progress = 100;
+      if (tasks[idx].col === 0) tasks[idx].progress = 0;
+      save();
+    }
+
+    function openModal() { document.getElementById('task-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
+
+    function saveNewTask() {
+      const title = document.getElementById('m-title').value;
+      const desc = document.getElementById('m-desc').value;
+      const priority = document.getElementById('m-priority').value;
+      const cat = document.getElementById('m-cat').value;
+      if (!title) return alert('Please enter a task title');
+
+      const nextNum = tasks.length + 101;
+      tasks.push({
+        id: `TSK-${nextNum}`,
+        col: 0,
+        title,
+        desc: desc || 'Deliverable criteria defined by engineering team.',
+        priority,
+        cat,
+        progress: 0,
+        assignee: "GK"
+      });
+      closeModal();
+      save();
+    }
+
+    function filterTasks(val) { render(val); }
+    function setFilter(cat) {
+      document.querySelectorAll('.f-chip').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      render('', cat);
+    }
+
+    render();
+  </script>
+</body>
+</html>
